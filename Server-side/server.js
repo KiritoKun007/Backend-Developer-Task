@@ -1,6 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport");
+const config = require('./config/keys');
+const users = require("./routes/api/users");
+
 require('dotenv').config();
 
 const app = express();
@@ -12,13 +16,15 @@ app.use(
 );
 app.use(bodyParser.json());
 
-const db = require("./config/keys").mongoURI;
+const db = config.mongoURI;
 
 mongoose
   .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB successfully connected"))
   .catch(err => console.log(err));
 
-const port = process.env.PORT || 5000; 
+app.use(passport.initialize());
+require("./config/passport")(passport);
+app.use("/api/users", users);
 
-app.listen(port, () => console.log(`Server up and running on port ${port} !`));
+app.listen(config.port, () => console.log(`Server up and running on port ${config.port} !`));
