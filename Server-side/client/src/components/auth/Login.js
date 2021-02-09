@@ -1,12 +1,37 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import * as action from "../../store/actions";
+import classnames from "classnames";
 
-export default class Login extends Component {
+class Login extends Component {
   state = {
     email: "",
     password: "",
     errors: {},
   };
+
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    console.log(nextProps, prevState)
+    if (nextProps.auth.isAuthenticated) {
+      this.props.history.push("/dashboard"); 
+    } 
+    if (nextProps.errors !== prevState.errors) {
+      console.log("Ashish")
+
+      return ({
+        errors: nextProps.errors
+      });
+    } 
+    return null;
+  }
 
   onChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
@@ -18,7 +43,7 @@ export default class Login extends Component {
       email: this.state.email,
       password: this.state.password,
     };
-    console.log(userData);
+    this.props.login(userData);
   };
 
   render() {
@@ -48,8 +73,15 @@ export default class Login extends Component {
                   error={errors.email}
                   id="email"
                   type="email"
+                  className={classnames("", {
+                    invalid: errors.email || errors.emailnotfound
+                  })}
                 />
                 <label htmlFor="email">Email</label>
+                <span className="red-text">
+                  {errors.email}
+                  {errors.emailnotfound}
+                </span>
               </div>
               <div className="input-field col s12">
                 <input
@@ -58,8 +90,15 @@ export default class Login extends Component {
                   error={errors.password}
                   id="password"
                   type="password"
+                  className={classnames("", {
+                    invalid: errors.password || errors.passwordincorrect
+                  })}
                 />
                 <label htmlFor="password">Password</label>
+                <span className="red-text">
+                  {errors.password}
+                  {errors.passwordincorrect}
+                </span>
               </div>
               <div className="col s12" style={{ paddingLeft: "11.250px" }}>
                 <button
@@ -82,3 +121,25 @@ export default class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.error
+});
+
+const mapDispatchToProps = dispatch => { 
+  return {
+    login: (user) => dispatch(action.loginUser(user))
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);

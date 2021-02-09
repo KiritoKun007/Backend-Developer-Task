@@ -8,7 +8,11 @@ const subjectSchema = new Schema({
 
 const studentSchema = new Schema({
     name: String,
-    subjects: [subjectSchema]
+    subjects: [subjectSchema],
+    studentOf: {
+        type: Schema.Types.ObjectId,
+        ref: "users"
+    }
 })
 
 module.exports = Student = mongoose.model("students", studentSchema);

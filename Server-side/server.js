@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const config = require('./config/keys');
 const users = require("./routes/api/users");
+const students = require('./routes/api/students');
 
 require('dotenv').config();
 
@@ -26,5 +27,7 @@ mongoose
 app.use(passport.initialize());
 require("./config/passport")(passport);
 app.use("/api/users", users);
+
+app.use("/api/users/students", passport.authenticate('jwt', {session: false}), students)
 
 app.listen(config.port, () => console.log(`Server up and running on port ${config.port} !`));

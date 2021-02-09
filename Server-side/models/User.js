@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Student = require("./Student");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -14,6 +15,7 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  students: [{ type: Schema.Types.ObjectId, ref: "students" }],
   date: {
     type: Date,
     default: Date.now
